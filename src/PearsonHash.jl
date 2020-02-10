@@ -1,7 +1,7 @@
 module PearsonHash
 
 using Random: shuffle!
-export hash8, hashn
+export hash8, hashn, hashn!
 
 _table = shuffle!(collect(0:255))
 
@@ -20,17 +20,18 @@ hash8(data::AbstractString, seed::UInt8 = zero(UInt8)) = hash8(Vector{UInt8}(dat
 
 Compute a (`8*n`)-bit hash for data (optionally specify `seed`).
 """
-function hashn(data::Array{UInt8}, n::Integer, seed::UInt8 = zero(UInt8))
+function hashn!(data::Array{UInt8}, n::Integer, seed::UInt8 = zero(UInt8))
     (n > 16) && @warn "hashn does not support n > 16 (results may be wrong)"
 
     h = UInt128(0)
+    firstbyte = data[1]
     for i in 0:(n - 1)
-        firstbyte = UInt8((data[1] + i) % 256)
-        h |= hash8([firstbyte; data[2:end]], seed) << (i * 8)
+        data[1] = UInt8((firstbyte + i) % 256)
+        h |= hash8(data, seed) << (i * 8)
     end
 
     return h
 end
-hashn(data::AbstractString, n::Integer, seed::UInt8 = zero(UInt8)) = hashn(Vector{UInt8}(data), n, seed)
+hashn(data::AbstractString, n::Integer, seed::UInt8 = zero(UInt8)) = hashn!(Vector{UInt8}(data), n, seed)
 
 end # module
