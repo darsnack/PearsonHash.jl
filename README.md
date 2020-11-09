@@ -22,3 +22,4 @@ For this simple package, just use the REPL:
 julia> ?hash8
 julia> ?hashn!
 julia> ?hashn
+```
